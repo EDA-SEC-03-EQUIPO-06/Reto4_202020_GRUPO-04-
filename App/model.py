@@ -41,12 +41,66 @@ de creacion y consulta sobre las estructuras de datos.
 # -----------------------------------------------------
 #                       API
 # -----------------------------------------------------
+def newAnalyzer():
+    citibike = {"graph":None,
+                "components": None}
+    citibike["graph"] = gr.newGraph(datastructure='ADJ_LIST',
+                                    directed=True,
+                                    size=1000,
+                                    comparefunction= compareStations)
+    return citibike
 
 # Funciones para agregar informacion al grafo
-
+def addTrip(citibike, trip):
+    """
+    """
+    origin = trip["start station id"]
+    destination = trip["end station id"]
+    duration = int(trip["tripduration"])
+    addStation(citibike, origin)
+    addStation(citibike, destination)
+    addConnection(citibike, origin, destination, duration)
+    
+def addStation(citibike, stationid):
+    if not gr.containsVertex(citibike["graph"], stationid):
+        gr.insertVertex(citibike["graph"], stationid)
+    return citibike
+    
+def addConnection(citibike, origin, destination, duration):
+    edge = gr.getEdge(citibike["graph"], origin, destination)
+    if edge is None:
+        gr.addEdge(citibike["graph"], origin, destination, duration)
+    else:
+        edge["weight"] = (edge["weight"] + duration)/2
+    return citibike
 # ==============================
 # Funciones de consulta
 # ==============================
+
+    
+def totalRoutes(analyzer):
+    """
+    Retorna el total arcos del grafo
+    """
+    return gr.numEdges(analyzer['graph'])
+    
+def totalStations(analyzer):
+    """
+    Retorna el total de estaciones (vertices) del grafo
+    """
+    return gr.numVertices(analyzer['graph'])
+    
+def connectedComponents(analyzer):
+    """
+    Calcula los componentes conectados del grafo
+    Se utiliza el algoritmo de Kosaraju
+    """
+    analyzer['components'] = scc.KosarajuSCC(analyzer['graph'])
+    return scc.connectedComponents(analyzer['components'])
+    
+def sameCC(analyzer,station1,station2):
+    return scc.stronglyConnected(analyzer['components'],station1,station2)
+
 
 # ==============================
 # Funciones Helper
@@ -55,3 +109,15 @@ de creacion y consulta sobre las estructuras de datos.
 # ==============================
 # Funciones de Comparacion
 # ==============================
+
+def compareStations(stop, keyvaluestop):
+    """
+    Compara dos estaciones
+    """
+    stopcode = keyvaluestop['key']
+    if (stop == stopcode):
+        return 0
+    elif (stop > stopcode):
+        return 1
+    else:
+        return -1

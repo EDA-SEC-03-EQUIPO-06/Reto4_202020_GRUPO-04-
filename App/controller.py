@@ -25,6 +25,7 @@
  """
 
 import config as cf
+import os
 from App import model
 import csv
 
@@ -40,12 +41,56 @@ recae sobre el controlador.
 #  Inicializacion del catalogo
 # ___________________________________________________
 
+def init():
+    """
+    Llama la funcion de inicializacion  del modelo.
+    """
+    # analyzer es utilizado para interactuar con el modelo
+    analyzer = model.newAnalyzer()
+    return analyzer
 
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
 # ___________________________________________________
 
+def loadTrips(citibike):
+    for filename in os.listdir(cf.data_dir):
+        if filename.endswith('.csv'):
+            print('Cargando archivo: ' + filename)
+            loadFile(citibike, filename)
+    return citibike
+    
+def loadFile(citibike, tripfile):
+    """
+    """
+    tripfile = cf.data_dir + tripfile
+    input_file = csv.DictReader(open(tripfile, encoding= "utf-8"),
+                                delimiter = ",")
+    for trip in input_file:
+        model.addTrip(citibike, trip)
+    return citibike
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
+
+def totalRoutes(analyzer):
+    """
+    Total de enlaces entre las paradas
+    """
+    return model.totalRoutes(analyzer)
+    
+def totalStations(analyzer):
+    """
+    Total de paradas de autobus
+    """
+    return model.totalStations(analyzer)
+    
+def connectedComponents(analyzer):
+    """
+    Numero de componentes fuertemente conectados
+    """
+    return model.connectedComponents(analyzer)
+    
+def sameCluster(analyzer,station1,station2):
+    return model.sameCC(analyzer,station1,station2)
