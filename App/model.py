@@ -28,9 +28,11 @@ from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
 from DISClib.DataStructures import listiterator as it
+from DISClib.DataStructures import edge as ed
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
+from DISClib.Algorithms.Graphs import scc
 assert config
 
 """
@@ -41,17 +43,93 @@ de creacion y consulta sobre las estructuras de datos.
 # -----------------------------------------------------
 #                       API
 # -----------------------------------------------------
+def newAnalyzer():
+    citibike = {
+        "graph": None, 
+        "connections": None
+        }
+
+    citibike["graph"] = gr.newGraph(datastructure = 'ADJ_LIST', 
+                                directed = True,
+                                size = 10000,
+                                comparefunction = compareStation)
+    return citibike
+
 
 # Funciones para agregar informacion al grafo
+def addTrip(citibike, trip):
+    """
+    """
+    origin = trip["start station id"]
+    destination = trip["end station id"]
+    duration = int(trip["tripduration"])
+    addStation(citibike, origin)
+    addStation(citibike, destination)
+    addConnection(citibike, origin, destination, duration)
+ 
+def addStation(citibike, stationid):
+    if not gr.containsVertex(citibike["graph"], stationid):
+        gr.insertVertex(citibike["graph"], stationid)
+    return citibike
+
+
+def addConnection(citibike, origin, destination, distance):
+    edge = gr.getEdge(citibike['graph'], origin, destination)
+    if edge is None:
+        gr.addEdge(citibike['graph'], origin, destination, distance)
+    else:
+        ed.updateAverageWeight(edge, distance)
+    return citibike
+
 
 # ==============================
 # Funciones de consulta
 # ==============================
+def connectedComponents(analyzer):
+
+    analyzer['connections'] = scc.KosarajuSCC(analyzer['graph'])
+    return scc.connectedComponents(analyzer['connections'])
+
+
+
+def totalStation(analyzer):
+    """
+    Retorna el total de estaciones (vertices) del grafo
+    """
+    return gr.numVertices(analyzer['graph'])
+
+
+def totalConnections(analyzer):
+    """
+    Retorna el total arcos del grafo
+    """
+    return gr.numEdges(analyzer['graph'])
+
 
 # ==============================
 # Funciones Helper
 # ==============================
 
+def numSCC(graph, sc):
+    "Segun Kosaraju  componentes fuertemente conectados"
+    sc = scc.KosarajuSCC(graph)
+    return scc.connectedComponents(sc)
+
+def sameCC(sc, station1, station2):
+    return scc.stronglyConnected(sc, station1, station2)
+
+
+
 # ==============================
 # Funciones de Comparacion
 # ==============================
+
+def compareStation(stop, keyvaluestop):
+
+    stopcode = keyvaluestop['key']
+    if (stop == stopcode):
+        return 0
+    elif (stop > stopcode):
+        return 1
+    else:
+        return -1
