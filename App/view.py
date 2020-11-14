@@ -60,7 +60,7 @@ def printMenu():
     print("2- Cargar información de buses de singapur")
     print("3- Calcular componentes conectados")
     print("4- Establecer estación base:")
-    print("5- Hay camino entre estacion base y estación: ")
+    print("5- Conseguir Top 3 de estaciones")
     print("6- Ruta de costo mínimo desde la estación base y estación: ")
     print("7- Estación que sirve a mas rutas: ")
     print("0- Salir")
@@ -96,10 +96,7 @@ def optionFour():
 
 
 def optionFive():
-    haspath = controller.hasPath(cont, destStation)
-    print('Hay camino entre la estación base : ' +
-          'y la estación: ' + destStation + ': ')
-    print(haspath)
+    print(controller.getTop(cont))
 
 
 def optionSix():
@@ -147,7 +144,7 @@ while True:
         print("Tiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 5:
-        destStation = input("Estación destino (Ej: 15151-10): ")
+        #destStation = input("Estación destino (Ej: 15151-10): ")
         executiontime = timeit.timeit(optionFive, number=1)
         print("Tiempo de ejecución: " + str(executiontime))
 

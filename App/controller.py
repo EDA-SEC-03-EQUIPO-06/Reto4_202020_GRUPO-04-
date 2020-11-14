@@ -94,3 +94,7 @@ def connectedComponents(analyzer):
     
 def sameCluster(analyzer,station1,station2):
     return model.sameCC(analyzer,station1,station2)
+    
+def getTop(analyzer):
+    PQs = model.stationsUsage(analyzer)
+    return model.organizeTop3(PQs)

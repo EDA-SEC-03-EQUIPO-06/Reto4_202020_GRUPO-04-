@@ -27,6 +27,7 @@ import config
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
+from DISClib.ADT import minpq as pq
 from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
@@ -101,6 +102,59 @@ def connectedComponents(analyzer):
     
 def sameCC(analyzer,station1,station2):
     return scc.stronglyConnected(analyzer['components'],station1,station2)
+    
+
+#Requerimento 3
+def stationsUsage(analyzer):
+    indegreePQ = pq.newMinPQ(cmpfunction= compareDegreeMax)
+    outdegreePQ = pq.newMinPQ(cmpfunction= compareDegreeMax)
+    lessUsedPQ = pq.newMinPQ(cmpfunction= compareDegreeMin)
+    vortexLst = gr.vertices(analyzer["graph"])
+    ite = it.newIterator(vortexLst)
+    
+    
+    while it.hasNext(ite):
+        station = it.next(ite)
+        
+        #Se obtienen los valores de las estaciones que entran, que salen y su suma
+        
+        indegree = gr.indegree(analyzer["graph"],station)
+        print(indegree)
+        outdegree = gr.outdegree(analyzer["graph"],station)
+        usage = outdegree+indegree
+        #Se crean entradas para organizar en el PQ
+        
+        indegreeEntry = {"key": indegree, "station": station}
+        outdegreeEntry = {"key": outdegree, "station": station}
+        usageEntry = {"key": usage, "station": station}
+        
+        #Se inserta cada entrada en los PQ correspondientes
+        pq.insert(indegreePQ, indegreeEntry)
+        pq.insert(lessUsedPQ,usageEntry)
+        pq.insert(outdegreePQ, outdegreeEntry)
+        
+    return {"In": indegreePQ,"Out": outdegreePQ, "Usage": lessUsedPQ}
+    
+def organizeTop3(PQs):
+    InTop = []
+    OutTop = []
+    UsageTop = []
+    for i in range (0,3):
+        #Se sacan los 3 primeros de cada Pq
+        In = pq.delMin(PQs["In"])
+        Out = pq.delMin(PQs["Out"])
+        Usage = pq.delMin(PQs["Usage"])
+        
+        InTop.append({"id": In["station"], "In": In["key"]} )
+        OutTop.append({"id": Out["station"], "Out": Out["key"] })
+        UsageTop.append({"id": Usage["station"], "Usage": Usage["key"] })
+        
+    return {"In": InTop,"Out": OutTop, "Usage": UsageTop}
+        
+        
+        
+    
+
 
 
 # ==============================
@@ -119,6 +173,26 @@ def compareStations(stop, keyvaluestop):
     if (stop == stopcode):
         return 0
     elif (stop > stopcode):
+        return 1
+    else:
+        return -1
+        
+def compareDegreeMax(value1,value2):
+    value1 = value1["key"]
+    value2 = value2["key"]
+    if value1 == value2:
+        return 0
+    elif value1 > value2:
+        return -1
+    else:
+        return 1
+        
+def compareDegreeMin(value1,value2):
+    value1 = value1["key"]
+    value2 = value2["key"]
+    if value1 == value2:
+        return 0
+    elif value1 > value2:
         return 1
     else:
         return -1
