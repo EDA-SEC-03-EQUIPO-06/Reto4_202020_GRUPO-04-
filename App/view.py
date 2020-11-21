@@ -80,41 +80,73 @@ def optionTwo():
 
 
 def optionThree():
+    """
+    Requerimento 1
+    """
     print('El número de componentes conectados es: ' +
           str(controller.connectedComponents(cont)))
     s1 = input("Inserte el id de una estacion: ")
     s2 = input("Inserte el id de otra estacion: ")
     same = controller.sameCluster(cont, s1, s2)
-    if same:
+    if same == None:
+        print("Alguna de las estaciones ingresadas no existe")
+    elif same:
         print("Las estaciones estan en el mismo cluster")
     else:
         print("Las estaciones no estan en el mismo cluster")
 
 
 def optionFour():
-    controller.minimumCostPaths(cont, initialStation)
-
-
+    """
+    Requerimento 2
+    """
+    
 def optionFive():
-    print(controller.getTop(cont))
-
+    """
+    Requerimento 3
+    """
+    info = controller.getTop(cont)
+    print("\nTop 3 de las estaciones con mas llegadas: \n")
+    for i in info["In"]:
+        print("■ "+ i["id"]+" con un total de "+ str(i["In"])+" llegadas")
+    print("\nTop 3 de las estaciones con mas salidas \n")
+    for i in info["Out"]:
+        print("■ "+ i["id"]+" con un total de "+ str(i["Out"])+" llegadas")
+    print("\nTop 3 de las estaciones menos usadas: \n")
+    for i in info["Usage"]:
+        print("■ "+ i["id"]+" con un total de "+ str(i["Usage"])+" llegadas y salidas")
+    
 
 def optionSix():
-    path = controller.minimumCostPath(cont, destStation)
-    if path is not None:
-        pathlen = stack.size(path)
-        print('El camino es de longitud: ' + str(pathlen))
-        while (not stack.isEmpty(path)):
-            stop = stack.pop(path)
-            print(stop)
-    else:
-        print('No hay camino')
-
+    """
+    Requerimento 4
+    """
+    
 
 def optionSeven():
-    maxvert, maxdeg = controller.servedRoutes(cont)
-    print('Estación: ' + maxvert + '  Total rutas servidas: '
-          + str(maxdeg))
+    """
+    Requerimento 5
+    """
+    
+def optionEight():
+    """
+    Requerimento 6
+    """
+    info = controller.getClosestTouristicRoute(cont,coordsu,coordsd)
+    print("\n=====================================================")
+    print("La parada mas cercana a ti es: "+info["InitialStation"])
+    print("La parada mas cercana a tu destino es: "+ info["EndStation"])
+    if info["Route"] is None:
+        print("Lo sentimos, no hay una ruta disponible entre estas dos paradas :(")
+    else:
+        print("La ruta con la que llegaras en menor tiempo es: ")
+        for parada in info["Route"]:
+            print("■ "+parada)
+        print("El tiempo aproximado de esta ruta es de "+ str(info["Time"])+ " segundos. Buena suerte!")
+    
+    
+    
+
 
 
 """
@@ -156,6 +188,15 @@ while True:
     elif int(inputs[0]) == 7:
         executiontime = timeit.timeit(optionSeven, number=1)
         print("Tiempo de ejecución: " + str(executiontime))
+        
+    elif int(inputs[0]) == 8:
+        latu = float(input("Ingrese la latitud de su ubicacion: "))
+        lonu = float(input("Ingrese la longitud de su ubicacion:"))
+        latd = float(input("Ingrese la latitud del sitio que desea visitar: "))
+        lond = float(input("Ingrese la longitud del sitio que desea visitar: "))
+        coordsu = (latu,lonu)
+        coordsd = (latd,lond)
+        executiontime = timeit.timeit(optionEight, number=1)
 
     else:
         sys.exit(0)

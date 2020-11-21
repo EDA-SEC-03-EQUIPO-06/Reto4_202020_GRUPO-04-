@@ -98,3 +98,6 @@ def sameCluster(analyzer,station1,station2):
 def getTop(analyzer):
     PQs = model.stationsUsage(analyzer)
     return model.organizeTop3(PQs)
+    
+def getClosestTouristicRoute(cont,coordsu,coordsd):
+    return model.giveShortestRoute(cont, coordsu, coordsd)

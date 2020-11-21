@@ -28,7 +28,9 @@ from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
 from DISClib.ADT import minpq as pq
+from DISClib.ADT import stack as st
 from DISClib.DataStructures import listiterator as it
+from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
@@ -50,22 +52,27 @@ def newAnalyzer():
                                     directed=True,
                                     size=1000,
                                     comparefunction= compareStations)
+    citibike["stationinfo"] = m.newMap(numelements=1400,
+                                       maptype= 'PROBING',
+                                       comparefunction= compareStationsMap)
     return citibike
 
 # Funciones para agregar informacion al grafo
 def addTrip(citibike, trip):
     """
     """
-    origin = trip["start station id"]
-    destination = trip["end station id"]
+    origin = organizeData(trip,True)
+    destination = organizeData(trip,False)
     duration = int(trip["tripduration"])
     addStation(citibike, origin)
     addStation(citibike, destination)
-    addConnection(citibike, origin, destination, duration)
+    addConnection(citibike, origin["StationID"], destination["StationID"], duration)
     
-def addStation(citibike, stationid):
-    if not gr.containsVertex(citibike["graph"], stationid):
-        gr.insertVertex(citibike["graph"], stationid)
+def addStation(citibike, info):
+    if not gr.containsVertex(citibike["graph"], info["StationID"]):
+        gr.insertVertex(citibike["graph"], info["StationID"])
+    if not m.contains(citibike['stationinfo'], info["StationID"]):
+        m.put(citibike['stationinfo'],info["StationID"],info)
     return citibike
     
 def addConnection(citibike, origin, destination, duration):
@@ -75,6 +82,8 @@ def addConnection(citibike, origin, destination, duration):
     else:
         e.updateAverageWeight(edge,duration)
     return citibike
+    
+
 # ==============================
 # Funciones de consulta
 # ==============================
@@ -101,7 +110,10 @@ def connectedComponents(analyzer):
     return scc.connectedComponents(analyzer['components'])
     
 def sameCC(analyzer,station1,station2):
-    return scc.stronglyConnected(analyzer['components'],station1,station2)
+    try: 
+        return scc.stronglyConnected(analyzer['components'],station1,station2)
+    except:
+        return None
     
 
 #Requerimento 3
@@ -115,18 +127,17 @@ def stationsUsage(analyzer):
     
     while it.hasNext(ite):
         station = it.next(ite)
-        
+        StationName = getName(analyzer["stationinfo"],station)
         #Se obtienen los valores de las estaciones que entran, que salen y su suma
         
         indegree = gr.indegree(analyzer["graph"],station)
-        print(indegree)
         outdegree = gr.outdegree(analyzer["graph"],station)
         usage = outdegree+indegree
         #Se crean entradas para organizar en el PQ
         
-        indegreeEntry = {"key": indegree, "station": station}
-        outdegreeEntry = {"key": outdegree, "station": station}
-        usageEntry = {"key": usage, "station": station}
+        indegreeEntry = {"key": indegree, "station": StationName}
+        outdegreeEntry = {"key": outdegree, "station": StationName}
+        usageEntry = {"key": usage, "station": StationName}
         
         #Se inserta cada entrada en los PQ correspondientes
         pq.insert(indegreePQ, indegreeEntry)
@@ -150,16 +161,114 @@ def organizeTop3(PQs):
         UsageTop.append({"id": Usage["station"], "Usage": Usage["key"] })
         
     return {"In": InTop,"Out": OutTop, "Usage": UsageTop}
-        
-        
+    
+#Requerimento 6
+
+def giveShortestRoute(analyzer, originCoords, destCoords):
+    """
+    Encuentra la ruta mas corta para ir desde una posicion (originCoords) a otra (destCoords).
+    Args:
+        analyzer: Estructura de datos principal
+        originCoords: Tupla con las coordenadas x,y de la posicion del usuario.
+        destCoords: Tupla con las coordenadas x,y del destino del usuario.
+    """
+    originStationId = getClosestStation(analyzer, originCoords)
+    destinStationId = getClosestStation(analyzer, destCoords)
+    
+    search = djk.Dijkstra(analyzer["graph"], originStationId)
+    path = djk.pathTo(search, destinStationId)
+    
+    originStationName = getName(analyzer["stationinfo"], originStationId)
+    destinStationName = getName(analyzer["stationinfo"], destinStationId)
+    time = djk.distTo(search, destinStationId)
+    route = []
+    
+    if path is None:
+        route = None
+    else:
+        while not st.isEmpty(path):
+            entry = st.pop(path)
+            id = entry["vertexA"]
+            name = getName(analyzer["stationinfo"], id)
+            route.append(name)
+            if st.size(path) == 1:
+                id2 = entry["vertexB"]
+                name2 = getName(analyzer["stationinfo"],id2)
+                route.append(name2)
+    
+    finalInfo = {"InitialStation": originStationName, "EndStation": destinStationName, "Route": route, "Time": time}
+    return finalInfo
         
     
-
+    
 
 
 # ==============================
 # Funciones Helper
 # ==============================
+
+def organizeData(information, origin):
+    """
+    Crea un diccionario con informacion sobre una estacion en particular
+    Args:
+        information: El diccionario que viene del archivo con toda la info sobre un viaje
+        Origin: Un booleando que define si se esta arreglando la estacion de inicio o de final de un viaje en particular 
+    """
+    stationInfo = {"StationID":None, "StationName": None, "Coordinates": None}
+    if origin:
+        stationInfo["StationID"] = information["start station id"]
+        stationInfo["StationName"] = information["start station name"]
+        stationInfo["Coordinates"] = (float(information["start station latitude"]),float(information["start station longitude"]))
+    else:
+        stationInfo["StationID"] = information["end station id"]
+        stationInfo["StationName"] = information["end station name"]
+        stationInfo["Coordinates"] = (float(information["end station latitude"]),float(information["end station longitude"]))
+    return stationInfo
+    
+def getClosestStation(analyzer, coords):
+    """
+    Retorna el ID de la estacion mas cercana a las coordenadas dadas
+    Args:
+        analyzer: Estructura de datos principal
+        coords: Coordenadas de donde se quiere hallar la estacion mas cercana
+    """
+    
+    map = analyzer["stationinfo"]
+    stations = m.keySet(map) #Obtiene los id de todas las estaciones en el analizador
+    ite = it.newIterator(stations)
+    
+    closestDist = -1
+    closestID = ""
+    
+    while it.hasNext(ite):
+    
+        id = it.next(ite)
+        station = me.getValue(m.get(map,id))
+        dist = getDistance(station["Coordinates"], coords)
+        if closestDist == -1:
+            closestDist = dist
+            closestID = station["StationID"]
+        else:
+            if dist < closestDist:
+                closestDist = dist
+                closestID = station["StationID"]
+    
+    return closestID
+    
+def getDistance(coords1,coords2):
+    """
+    Retorna la distancia entre dos coordenadas dadas
+    """
+    distanceSquared = (coords1[0]-coords2[0])**2 + (coords1[1]-coords2[1])**2
+    return distanceSquared**0.5
+
+def getName(map, key):
+    """
+    Retorna el nombre de una estacion asociada al ID dado (key)
+    """
+    
+    info = me.getValue(m.get(map,key))
+    return info["StationName"]
 
 # ==============================
 # Funciones de Comparacion
@@ -176,6 +285,16 @@ def compareStations(stop, keyvaluestop):
         return 1
     else:
         return -1
+        
+def compareStationsMap(value1,value2):
+    value2 = value2["key"]
+    if value1 == value2:
+        return 0
+    elif value1 > value2:
+        return -1
+    else:
+        return 1
+
         
 def compareDegreeMax(value1,value2):
     value1 = value1["key"]
