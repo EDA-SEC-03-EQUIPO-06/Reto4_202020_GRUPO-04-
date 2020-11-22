@@ -101,3 +101,6 @@ def getTop(analyzer):
     
 def getClosestTouristicRoute(cont,coordsu,coordsd):
     return model.giveShortestRoute(cont, coordsu, coordsd)
+ 
+def recorrido_resistencia(analyzer,initStation, Tmax):
+    return model.recorrido_resistencia(analyzer, initStation, Tmax)
