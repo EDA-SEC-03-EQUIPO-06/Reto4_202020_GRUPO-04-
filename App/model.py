@@ -61,18 +61,43 @@ def newAnalyzer():
 def addTrip(citibike, trip):
     """
     """
-    origin = organizeData(trip,True)
-    destination = organizeData(trip,False)
-    duration = int(trip["tripduration"])
-    addStation(citibike, origin)
-    addStation(citibike, destination)
-    addConnection(citibike, origin["StationID"], destination["StationID"], duration)
+    origin = trip["start station id"]
+    destination = trip["end station id"]
     
-def addStation(citibike, info):
-    if not gr.containsVertex(citibike["graph"], info["StationID"]):
-        gr.insertVertex(citibike["graph"], info["StationID"])
-    if not m.contains(citibike['stationinfo'], info["StationID"]):
-        m.put(citibike['stationinfo'],info["StationID"],info)
+    if not m.contains(citibike["stationinfo"], origin):
+        originInfo = organizeData(trip,True)
+    else:
+        originInfo = me.getValue(m.get(citibike["stationinfo"],origin))
+    if not m.contains(citibike["stationinfo"], destination):
+        destinationInfo = organizeData(trip,False)
+    else:
+        destinationInfo = me.getValue(m.get(citibike["stationinfo"],destination))
+        
+    duration = int(trip["tripduration"])
+    addStation(citibike, origin, originInfo)
+    addStation(citibike, destination, destinationInfo)
+    addConnection(citibike, origin, destination, duration)
+    addAges(originInfo,trip, True)
+    addAges(destinationInfo, trip, False)
+    
+def addAges(station,info, origin):
+    group = getAgeGroup(info["birth year"])
+    en = {"In": 0, "Out": 0}
+    if not m.contains(station["Ages"],group):
+        m.put(station["Ages"], group, en)
+    entry = me.getValue(m.get(station["Ages"], group))
+    if origin:
+        entry["Out"] += 1
+    else:
+        entry["In"] += 1
+    m.put(station["Ages"], group, entry)
+    return station
+    
+def addStation(citibike, id, info):
+    if not gr.containsVertex(citibike["graph"], id):
+        gr.insertVertex(citibike["graph"], id)
+    if not m.contains(citibike['stationinfo'], id):
+        m.put(citibike['stationinfo'],id,info)
     return citibike
     
 def addConnection(citibike, origin, destination, duration):
@@ -214,15 +239,20 @@ def organizeData(information, origin):
         information: El diccionario que viene del archivo con toda la info sobre un viaje
         Origin: Un booleando que define si se esta arreglando la estacion de inicio o de final de un viaje en particular 
     """
-    stationInfo = {"StationID":None, "StationName": None, "Coordinates": None}
+    stationInfo = {"StationID":None, "StationName": None, "Coordinates": None,"Ages":None}
     if origin:
         stationInfo["StationID"] = information["start station id"]
         stationInfo["StationName"] = information["start station name"]
         stationInfo["Coordinates"] = (float(information["start station latitude"]),float(information["start station longitude"]))
+        stationInfo["Ages"] = m.newMap(maptype="PROBING",
+                                         comparefunction= compareAges)
+        
     else:
         stationInfo["StationID"] = information["end station id"]
         stationInfo["StationName"] = information["end station name"]
         stationInfo["Coordinates"] = (float(information["end station latitude"]),float(information["end station longitude"]))
+        stationInfo["Ages"] = m.newMap(maptype="PROBING",
+                                         comparefunction= compareAges)
     return stationInfo
     
 def getClosestStation(analyzer, coords):
@@ -269,6 +299,25 @@ def getName(map, key):
     
     info = me.getValue(m.get(map,key))
     return info["StationName"]
+    
+def getAgeGroup(birth):
+    age = 2018- int(birth)
+    if age <= 10:
+        return "0-10"
+    elif age <= 20:
+        return "11-20"
+    elif age <= 30:
+        return "21-30"
+    elif age <= 40:
+        return "31-40"
+    elif age <= 50:
+        return "41-50"
+    elif age <= 60:
+        return "51-60"
+    else:
+        return "60+"
+        
+    
 
 # ==============================
 # Funciones de Comparacion
@@ -315,3 +364,12 @@ def compareDegreeMin(value1,value2):
         return 1
     else:
         return -1
+
+def compareAges(value1,value2):
+    value2 = value2["key"]
+    if value1 == value2:
+        return 0
+    elif value1 > value2:
+        return -1
+    else:
+        return 1
