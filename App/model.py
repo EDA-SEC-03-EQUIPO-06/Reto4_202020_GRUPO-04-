@@ -186,7 +186,35 @@ def organizeTop3(PQs):
         UsageTop.append({"id": Usage["station"], "Usage": Usage["key"] })
         
     return {"In": InTop,"Out": OutTop, "Usage": UsageTop}
-    
+#Requerimiento 4
+def recorrido_resistencia(analyzer, initStation, Tmax):
+    newGraph=bfs.BreadhtFisrtSearch(analyzer["graph"], initStation,Tmax)
+    #archivo=open("perro.txt","w")
+    #archivo.write(str(newGraph))
+    #print(newGraph["visited"]["table"])
+    #i=it.newIterator(newGraph["visited"]["table"])
+    rutas=[]
+    #while it.hasNext(i):
+        #el=it.next(i)
+    for el in newGraph["visited"]["table"]["elements"]:
+        if el["key"]!=None and el["value"]["final"]==True:
+                ruta=[]
+                path=bfs.pathTo(newGraph,el["key"])
+                i=0
+                while not st.isEmpty(path):
+                    entry = st.pop(path)
+                    if entry==initStation:
+                        ruta= {"Estaciones":[entry], "Duraciones":[]}
+                    else:
+                        ruta["Estaciones"].append(entry)
+                        edge = gr.getEdge(analyzer["graph"],ruta["Estaciones"][i-1] , entry)
+                        duration=edge['weight']/60
+                        ruta["Duraciones"].append(duration)
+                    i+=1
+                rutas.append(ruta)
+    print(rutas)
+    return rutas
+
 #Requerimento 6
 
 def giveShortestRoute(analyzer, originCoords, destCoords):
