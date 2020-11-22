@@ -1,5 +1,5 @@
 """
- * Copyright 2020, Departamento de sistemas y Computación
+ * Copyright 2020, Departamento de sistemas y ComputaciÃ³n
  * Universidad de Los Andes
  *
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * Contribución de:
+ * ContribuciÃ³n de:
  *
  * Dario Correal
  *
@@ -33,10 +33,10 @@ import timeit
 assert config
 
 """
-La vista se encarga de la interacción con el usuario.
+La vista se encarga de la interacciÃ³n con el usuario.
 Presenta el menu de opciones  y  por cada seleccion
 hace la solicitud al controlador para ejecutar la
-operación seleccionada.
+operaciÃ³n seleccionada.
 """
 
 # ___________________________________________________
@@ -57,19 +57,19 @@ def printMenu():
     print("*******************************************")
     print("Bienvenido")
     print("1- Inicializar Analizador")
-    print("2- Cargar información de buses de singapur")
+    print("2- Cargar informaciÃ³n de buses de singapur")
     print("3- Calcular componentes conectados")
-    print("4- Establecer estación base:")
+    print("4- Establecer estaciÃ³n base:")
     print("5- Conseguir Top 3 de estaciones")
-    print("6- Ruta de costo mínimo desde la estación base y estación: ")
-    print("7- Estación que sirve a mas rutas: ")
+    print("6- Ruta de costo mÃ­nimo desde la estaciÃ³n base y estaciÃ³n: ")
+    print("7- EstaciÃ³n que sirve a mas rutas: ")
     print("0- Salir")
     print("*******************************************")
 
 
 def optionTwo():
-    print("\nCargando información de transporte de singapur ....")
-    controller.loadTrips(cont)
+    print("\nCargando informaciÃ³n de transporte de singapur ....")
+    controller.loadFile(cont,file)
     numedges = controller.totalRoutes(cont)
     numvertex = controller.totalStations(cont)
     print('Numero de vertices: ' + str(numvertex))
@@ -83,7 +83,7 @@ def optionThree():
     """
     Requerimento 1
     """
-    print('El número de componentes conectados es: ' +
+    print('El nÃºmero de componentes conectados es: ' +
           str(controller.connectedComponents(cont)))
     s1 = input("Inserte el id de una estacion: ")
     s2 = input("Inserte el id de otra estacion: ")
@@ -108,13 +108,13 @@ def optionFive():
     info = controller.getTop(cont)
     print("\nTop 3 de las estaciones con mas llegadas: \n")
     for i in info["In"]:
-        print("■ "+ i["id"]+" con un total de "+ str(i["In"])+" llegadas")
+        print("â  "+ i["id"]+" con un total de "+ str(i["In"])+" llegadas")
     print("\nTop 3 de las estaciones con mas salidas \n")
     for i in info["Out"]:
-        print("■ "+ i["id"]+" con un total de "+ str(i["Out"])+" llegadas")
+        print("â  "+ i["id"]+" con un total de "+ str(i["Out"])+" llegadas")
     print("\nTop 3 de las estaciones menos usadas: \n")
     for i in info["Usage"]:
-        print("■ "+ i["id"]+" con un total de "+ str(i["Usage"])+" llegadas y salidas")
+        print("â  "+ i["id"]+" con un total de "+ str(i["Usage"])+" llegadas y salidas")
     
 
 def optionSix():
@@ -128,7 +128,7 @@ def optionSeven():
     """
     Requerimento 5
     """
-    
+    resultados=controller.recomendador_rutas(cont,rango)
 def optionEight():
     """
     Requerimento 6
@@ -142,7 +142,7 @@ def optionEight():
     else:
         print("La ruta con la que llegaras en menor tiempo es: ")
         for parada in info["Route"]:
-            print("■ "+parada)
+            print("â  "+parada)
         print("El tiempo aproximado de esta ruta es de "+ str(info["Time"])+ " segundos. Buena suerte!")
     
     
@@ -155,41 +155,42 @@ Menu principal
 """
 while True:
     printMenu()
-    inputs = input('Seleccione una opción para continuar\n>')
+    inputs = input('Seleccione una opciÃ³n para continuar\n>')
 
     if int(inputs[0]) == 1:
         print("\nInicializando....")
-        # cont es el controlador que se usará de acá en adelante
+        # cont es el controlador que se usarÃ¡ de acÃ¡ en adelante
         cont = controller.init()
 
     elif int(inputs[0]) == 2:
         executiontime = timeit.timeit(optionTwo, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
 
     elif int(inputs[0]) == 3:
         executiontime = timeit.timeit(optionThree, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
-
-    elif int(inputs[0]) == 4:
-        msg = "Estación Base: BusStopCode-ServiceNo (Ej: 75009-10): "
-        initialStation = input(msg)
-        executiontime = timeit.timeit(optionFour, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
-
-    elif int(inputs[0]) == 5:
-        #destStation = input("Estación destino (Ej: 15151-10): ")
-        executiontime = timeit.timeit(optionFive, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
-
-    elif int(inputs[0]) == 6:
-        Tmax=float(input("Ingere el tiempo máximo de resistencia en minutos: "))
-        initStation = input("Ingrese el ID de la estación de inicio (Ej: 72): ")
-        executiontime = timeit.timeit(optionSix, number=1)
         print("Tiempo de ejecuciÃ³n: " + str(executiontime))
 
+    elif int(inputs[0]) == 4:
+        msg = "EstaciÃ³n Base: BusStopCode-ServiceNo (Ej: 75009-10): "
+        initialStation = input(msg)
+        executiontime = timeit.timeit(optionFour, number=1)
+        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
+
+    elif int(inputs[0]) == 5:
+        #destStation = input("EstaciÃ³n destino (Ej: 15151-10): ")
+        executiontime = timeit.timeit(optionFive, number=1)
+        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
+
+    elif int(inputs[0]) == 6:
+        Tmax=float(input("Ingere el tiempo mÃ¡ximo de resistencia en minutos: "))
+        initStation = input("Ingrese el ID de la estaciÃ³n de inicio (Ej: 72): ")
+        executiontime = timeit.timeit(optionSix, number=1)
+        print("Tiempo de ejecuciÃÂ³n: " + str(executiontime))
+
     elif int(inputs[0]) == 7:
+        rango=input("Ingrese rango de edad:")
         executiontime = timeit.timeit(optionSeven, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
         
     elif int(inputs[0]) == 8:
         latu = float(input("Ingrese la latitud de su ubicacion: "))
