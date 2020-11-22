@@ -1,5 +1,5 @@
 """
- * Copyright 2020, Departamento de sistemas y Computación,
+ * Copyright 2020, Departamento de sistemas y ComputaciÃ³n,
  * Universidad de Los Andes
  *
  * Desarrollado para el curso ISIS1225 - Estructuras de Datos y Algoritmos
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Contribución de:
+ * ContribuciÃ³n de:
  *
  * Dario Correal
  *
@@ -34,7 +34,7 @@ from DISClib.Utils import error as error
 assert config
 
 
-def BreadhtFisrtSearch(graph, source):
+def BreadhtFisrtSearch(graph, source, maxtime):
     """
     Genera un recorrido BFS sobre el grafo graph
     Args:
@@ -57,15 +57,16 @@ def BreadhtFisrtSearch(graph, source):
                                        )
         map.put(search['visited'], source, {'marked': True,
                                             'edgeTo': None,
-                                            'distTo': 0
+                                            'distTo': 0,
+                                            "final":False
                                             })
-        bfsVertex(search, graph, source)
+        bfsVertex(search, graph, source, maxtime)
         return search
     except Exception as exp:
         error.reraise(exp, 'bfs:BFS')
 
 
-def bfsVertex(search, graph, source):
+def bfsVertex(search, graph, source, maxtime):
     """
     Funcion auxiliar para calcular un recorrido BFS
     Args:
@@ -80,25 +81,45 @@ def bfsVertex(search, graph, source):
     try:
         adjsqueue = queue.newQueue()
         queue.enqueue(adjsqueue, source)
-        while not (queue.isEmpty(adjsqueue)):
+        
+        while not queue.isEmpty(adjsqueue):
+            
             vertex = queue.dequeue(adjsqueue)
             visited_v = map.get(search['visited'], vertex)['value']
             adjslst = g.adjacents(graph, vertex)
             adjslstiter = it.newIterator(adjslst)
-            while (it.hasNext(adjslstiter)):
+            
+            if not (it.hasNext(adjslstiter)):
+                visited_v["final"]=True
+            c=0
+            while (it.hasNext(adjslstiter)) :
+                if c==1 and vertex!=source:
+                    break
+                total_time=0
                 w = it.next(adjslstiter)
+                if not (it.hasNext(adjslstiter)) and c==0:
+                    visited_v["final"]=True
+                
+                edge = g.getEdge(graph, vertex, w)
+                time=edge['weight']/60
                 visited_w = map.get(search['visited'], w)
                 if visited_w is None:
-                    dist_to_w = visited_v['distTo'] + 1
-                    visited_w = {'marked': True,
-                                 'edgeTo': vertex,
-                                 "distTo": dist_to_w
-                                 }
-                    map.put(search['visited'], w, visited_w)
-                    queue.enqueue(adjsqueue, w)
+                    if visited_v["final"]==False:                        
+                        dist_to_w = visited_v['distTo'] + time
+                        total_time=dist_to_w
+                        if total_time<=maxtime:
+                            visited_w = {'marked': True,
+                                         'edgeTo': vertex,
+                                         "distTo": dist_to_w,
+                                         "final":False}
+                            map.put(search['visited'], w, visited_w)
+                            queue.enqueue(adjsqueue, w)
+                            c=1
+                        
         return search
     except Exception as exp:
         error.reraise(exp, 'bfs:bfsVertex')
+
 
 
 def hasPathTo(search, vertex):
