@@ -1,5 +1,5 @@
 """
- * Copyright 2020, Departamento de sistemas y Computación
+ * Copyright 2020, Departamento de sistemas y ComputaciÃ³n
  * Universidad de Los Andes
  *
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * Contribución de:
+ * ContribuciÃ³n de:
  *
  * Dario Correal
  *
@@ -32,6 +32,7 @@ from DISClib.ADT import stack as st
 from DISClib.DataStructures import listiterator as it
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Graphs import scc
+from DISClib.Algorithms.Graphs import bfs
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
 from DISClib.DataStructures import edge as e
@@ -83,14 +84,13 @@ def addTrip(citibike, trip):
 def addAges(station,info, origin):
     group = getAgeGroup(info["birth year"])
     en = {"In": 0, "Out": 0}
-    if not m.contains(station["Ages"],group):
-        m.put(station["Ages"], group, en)
-    entry = me.getValue(m.get(station["Ages"], group))
+    if not group in station["Ages"]:
+        station["Ages"][group]= en
+    entry = station["Ages"][group]
     if origin:
         entry["Out"] += 1
     else:
         entry["In"] += 1
-    m.put(station["Ages"], group, entry)
     return station
     
 def addStation(citibike, id, info):
@@ -215,6 +215,42 @@ def recorrido_resistencia(analyzer, initStation, Tmax):
     print(rutas)
     return rutas
 
+#Requerimiento 5
+
+def recomendador_rutas(analyzer,rango):
+    vertices = gr.vertices(analyzer["graph"])
+    iterator = it.newIterator(vertices)
+    InStationMax=""
+    InNumber=0
+    OutStationMax=""
+    OutNumber=0
+    while it.hasNext(iterator):
+        station = it.next(iterator)
+        AgesMap=getRangeAgesMap(analyzer["stationinfo"],station)
+        if rango in AgesMap:
+            entry=AgesMap[rango]
+            if entry["In"]>=InNumber:
+                InNumber=entry["In"]
+                InStationMax=station
+            if entry["Out"]>= OutNumber:
+                OutNumber=entry["In"]
+                OutStationMax=station
+    search = djk.Dijkstra(analyzer["graph"], OutStationMax)
+    path = djk.pathTo(search, InStationMax)
+    Estaciones=[]
+    
+    while not st.isEmpty(path):
+        info = st.pop(path)
+        station = info["vertexA"]
+        name = getName(analyzer["stationinfo"], station)
+        Estaciones.append(name)
+        if st.size(path) ==0:
+            FinalStation = info["vertexB"]
+            name2=getName(analyzer["stationinfo"], FinalStation)
+            Estaciones.append(name2)
+    print(OutStationMax,InStationMax,Estaciones)
+    return (OutStationMax,InStationMax,Estaciones)
+
 #Requerimento 6
 
 def giveShortestRoute(analyzer, originCoords, destCoords):
@@ -272,15 +308,13 @@ def organizeData(information, origin):
         stationInfo["StationID"] = information["start station id"]
         stationInfo["StationName"] = information["start station name"]
         stationInfo["Coordinates"] = (float(information["start station latitude"]),float(information["start station longitude"]))
-        stationInfo["Ages"] = m.newMap(maptype="PROBING",
-                                         comparefunction= compareAges)
+        
         
     else:
         stationInfo["StationID"] = information["end station id"]
         stationInfo["StationName"] = information["end station name"]
         stationInfo["Coordinates"] = (float(information["end station latitude"]),float(information["end station longitude"]))
-        stationInfo["Ages"] = m.newMap(maptype="PROBING",
-                                         comparefunction= compareAges)
+    stationInfo["Ages"]={}
     return stationInfo
     
 def getClosestStation(analyzer, coords):
@@ -327,6 +361,14 @@ def getName(map, key):
     
     info = me.getValue(m.get(map,key))
     return info["StationName"]
+
+def getRangeAgesMap(map,key):
+    """
+    Retorna el mapa del Rango de Edades de una estacion asociada al ID dado (key)
+    """
+    
+    info = me.getValue(m.get(map,key))
+    return info["Ages"]
     
 def getAgeGroup(birth):
     age = 2018- int(birth)
