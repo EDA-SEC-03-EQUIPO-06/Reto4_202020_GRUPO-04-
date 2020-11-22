@@ -1,5 +1,5 @@
 """
- * Copyright 2020, Departamento de sistemas y Computación
+ * Copyright 2020, Departamento de sistemas y ComputaciÃ³n
  * Universidad de Los Andes
  *
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * Contribución de:
+ * ContribuciÃ³n de:
  *
  * Dario Correal
  *
@@ -64,7 +64,6 @@ def loadTrips(citibike):
 def loadFile(citibike, tripfile):
     """
     """
-    tripfile = cf.data_dir + tripfile
     input_file = csv.DictReader(open(tripfile, encoding= "utf-8"),
                                 delimiter = ",")
     for trip in input_file:
@@ -104,3 +103,6 @@ def getClosestTouristicRoute(cont,coordsu,coordsd):
  
 def recorrido_resistencia(analyzer,initStation, Tmax):
     return model.recorrido_resistencia(analyzer, initStation, Tmax)
+
+def recomendador_rutas(analyzer,rango):
+    return model.recomendador_rutas(analyzer,rango)
