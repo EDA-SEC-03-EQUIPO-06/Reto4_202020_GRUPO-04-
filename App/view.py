@@ -121,6 +121,7 @@ def optionSix():
     """
     Requerimento 4
     """
+    paths = controller.recorrido_resistencia(cont,initStation, Tmax)
     
 
 def optionSeven():
@@ -181,9 +182,10 @@ while True:
         print("Tiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 6:
-        destStation = input("Estación destino (Ej: 15151-10): ")
+        Tmax=float(input("Ingere el tiempo máximo de resistencia en minutos: "))
+        initStation = input("Ingrese el ID de la estación de inicio (Ej: 72): ")
         executiontime = timeit.timeit(optionSix, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
 
     elif int(inputs[0]) == 7:
         executiontime = timeit.timeit(optionSeven, number=1)
