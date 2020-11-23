@@ -25,9 +25,9 @@
  """
 
 import config as cf
+import os
 from App import model
 import csv
-import os
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -42,7 +42,10 @@ recae sobre el controlador.
 # ___________________________________________________
 
 def init():
-
+    """
+    Llama la funcion de inicializacion  del modelo.
+    """
+    # analyzer es utilizado para interactuar con el modelo
     analyzer = model.newAnalyzer()
     return analyzer
 
@@ -50,23 +53,57 @@ def init():
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
 # ___________________________________________________
+
 def loadTrips(citibike):
     for filename in os.listdir(cf.data_dir):
         if filename.endswith('.csv'):
             print('Cargando archivo: ' + filename)
             loadFile(citibike, filename)
     return citibike
-
+    
 def loadFile(citibike, tripfile):
     """
     """
     tripfile = cf.data_dir + tripfile
-    input_file = csv.DictReader(open(tripfile, encoding="utf-8"),
-                                delimiter=",")
+    input_file = csv.DictReader(open(tripfile, encoding= "utf-8"),
+                                delimiter = ",")
     for trip in input_file:
         model.addTrip(citibike, trip)
     return citibike
-
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
+
+def totalRoutes(analyzer):
+    """
+    Total de enlaces entre las paradas
+    """
+    return model.totalRoutes(analyzer)
+    
+def totalStations(analyzer):
+    """
+    Total de paradas de autobus
+    """
+    return model.totalStations(analyzer)
+    
+def connectedComponents(analyzer):
+    """
+    Numero de componentes fuertemente conectados
+    """
+    return model.connectedComponents(analyzer)
+    
+def sameCluster(analyzer,station1,station2):
+    return model.sameCC(analyzer,station1,station2)
+    
+def getTop(analyzer):
+    PQs = model.stationsUsage(analyzer)
+    return model.organizeTop3(PQs)
+    
+def getClosestTouristicRoute(cont,coordsu,coordsd):
+    return model.giveShortestRoute(cont, coordsu, coordsd)
+
+def getCircularroute(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
+    avaibleTimemin = int(avaibleTimemin)
+    avaibleTimemax = int(avaibleTimemax)
+    return model.circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax)
+
