@@ -64,6 +64,7 @@ def loadTrips(citibike):
 def loadFile(citibike, tripfile):
     """
     """
+    tripfile=cf.data_dir+tripfile
     input_file = csv.DictReader(open(tripfile, encoding= "utf-8"),
                                 delimiter = ",")
     for trip in input_file:

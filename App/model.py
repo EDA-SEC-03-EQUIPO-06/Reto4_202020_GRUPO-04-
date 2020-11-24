@@ -192,14 +192,16 @@ def recorrido_resistencia(analyzer, initStation, Tmax):
     #archivo=open("perro.txt","w")
     #archivo.write(str(newGraph))
     #print(newGraph["visited"]["table"])
-    #i=it.newIterator(newGraph["visited"]["table"])
+    keys=m.keySet(newGraph["visited"])
+    iterator=it.newIterator(keys)
     rutas=[]
-    #while it.hasNext(i):
-        #el=it.next(i)
-    for el in newGraph["visited"]["table"]["elements"]:
-        if el["key"]!=None and el["value"]["final"]==True:
+    while it.hasNext(iterator):
+        station=it.next(iterator)
+    #for el in newGraph["visited"]["table"]["elements"]:
+        #if el["key"]!=None and el["value"]["final"]==True:
+        if me.getValue(m.get(newGraph["visited"],station))["final"]==True:
                 ruta=[]
-                path=bfs.pathTo(newGraph,el["key"])
+                path=bfs.pathTo(newGraph,station)
                 i=0
                 while not st.isEmpty(path):
                     entry = st.pop(path)
@@ -212,7 +214,6 @@ def recorrido_resistencia(analyzer, initStation, Tmax):
                         ruta["Duraciones"].append(duration)
                     i+=1
                 rutas.append(ruta)
-    print(rutas)
     return rutas
 
 #Requerimiento 5
@@ -235,6 +236,8 @@ def recomendador_rutas(analyzer,rango):
             if entry["Out"]>= OutNumber:
                 OutNumber=entry["In"]
                 OutStationMax=station
+    if len(OutStationMax)<=0 or len(InStationMax)<=0:
+        return 0
     search = djk.Dijkstra(analyzer["graph"], OutStationMax)
     path = djk.pathTo(search, InStationMax)
     Estaciones=[]
@@ -242,12 +245,12 @@ def recomendador_rutas(analyzer,rango):
     while not st.isEmpty(path):
         info = st.pop(path)
         station = info["vertexA"]
-        name = getName(analyzer["stationinfo"], station)
-        Estaciones.append(name)
+        #name = getName(analyzer["stationinfo"], station)
+        Estaciones.append(station)
         if st.size(path) ==0:
             FinalStation = info["vertexB"]
-            name2=getName(analyzer["stationinfo"], FinalStation)
-            Estaciones.append(name2)
+            #name2=getName(analyzer["stationinfo"], FinalStation)
+            Estaciones.append(FinalStation)
     print(OutStationMax,InStationMax,Estaciones)
     return (OutStationMax,InStationMax,Estaciones)
 
@@ -288,7 +291,8 @@ def giveShortestRoute(analyzer, originCoords, destCoords):
     finalInfo = {"InitialStation": originStationName, "EndStation": destinStationName, "Route": route, "Time": time}
     return finalInfo
         
-    
+#Requerimiento 7
+
     
 
 

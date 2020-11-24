@@ -61,15 +61,15 @@ def printMenu():
     print("3- Calcular componentes conectados")
     print("4- Establecer estaciÃ³n base:")
     print("5- Conseguir Top 3 de estaciones")
-    print("6- Ruta de costo mÃ­nimo desde la estaciÃ³n base y estaciÃ³n: ")
-    print("7- EstaciÃ³n que sirve a mas rutas: ")
+    print("6- Rutas por resistencia: ")
+    print("7- Estaciones más visitadas por rango de edad: ")
     print("0- Salir")
     print("*******************************************")
 
 
 def optionTwo():
     print("\nCargando informaciÃ³n de transporte de singapur ....")
-    controller.loadFile(cont,file)
+    controller.loadTrips(cont)
     numedges = controller.totalRoutes(cont)
     numvertex = controller.totalStations(cont)
     print('Numero de vertices: ' + str(numvertex))
@@ -83,7 +83,7 @@ def optionThree():
     """
     Requerimento 1
     """
-    print('El nÃºmero de componentes conectados es: ' +
+    print('El número de componentes conectados es: ' +
           str(controller.connectedComponents(cont)))
     s1 = input("Inserte el id de una estacion: ")
     s2 = input("Inserte el id de otra estacion: ")
@@ -122,6 +122,17 @@ def optionSix():
     Requerimento 4
     """
     paths = controller.recorrido_resistencia(cont,initStation, Tmax)
+    num=1
+    for ruta in paths:
+        i=0
+        print("\nRuta "+str(num))
+        while i<len(ruta["Duraciones"]):
+            print("• Estación {0}: ".format(i+1)+ str(ruta["Estaciones"][i]))
+            print("• Duración {0}->{1}: ".format(i+1,i+2)+str(round(ruta["Duraciones"][i],2))+" minutos")
+            i+=1
+        print("• Estación {0}: ".format(i+1)+str(ruta["Estaciones"][i]))
+        num+=1
+
     
 
 def optionSeven():
@@ -129,6 +140,15 @@ def optionSeven():
     Requerimento 5
     """
     resultados=controller.recomendador_rutas(cont,rango)
+    if resultados==0:
+        print("No se ecnontraron estaciones con usuarios en el rango de edad "+rango+".")
+    else:
+        print("Rango elegido: "+rango+" años")
+        print("El id de la estación de la que más salen usuarios en el rango es: "+resultados[0]+".")
+        print("El id de la estación a la que más llegan usuarios en el rango es: "+resultados[1]+".")
+        print("La ruta de estaciones es:")
+        print(" - ".join(resultados[2]))
+        
 def optionEight():
     """
     Requerimento 6
