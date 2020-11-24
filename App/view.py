@@ -141,13 +141,13 @@ def optionSeven():
     """
     resultados=controller.recomendador_rutas(cont,rango)
     if resultados==0:
-        print("No se ecnontraron estaciones con usuarios en el rango de edad "+rango+".")
+        print("\nNo se ecnontraron estaciones con usuarios en el rango de edad "+rango+".")
     else:
-        print("Rango elegido: "+rango+" años")
-        print("El id de la estación de la que más salen usuarios en el rango es: "+resultados[0]+".")
+        print("\nRango elegido: "+rango+" años")
+        print("\nEl id de la estación de la que más salen usuarios en el rango es: "+resultados[0]+".")
         print("El id de la estación a la que más llegan usuarios en el rango es: "+resultados[1]+".")
-        print("La ruta de estaciones es:")
-        print(" - ".join(resultados[2]))
+        print("La ruta de estaciones es: "+ " - ".join(resultados[2]))
+
         
 def optionEight():
     """
@@ -184,33 +184,33 @@ while True:
 
     elif int(inputs[0]) == 2:
         executiontime = timeit.timeit(optionTwo, number=1)
-        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
 
     elif int(inputs[0]) == 3:
         executiontime = timeit.timeit(optionThree, number=1)
-        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
 
     elif int(inputs[0]) == 4:
         msg = "EstaciÃ³n Base: BusStopCode-ServiceNo (Ej: 75009-10): "
         initialStation = input(msg)
         executiontime = timeit.timeit(optionFour, number=1)
-        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
 
     elif int(inputs[0]) == 5:
         #destStation = input("EstaciÃ³n destino (Ej: 15151-10): ")
         executiontime = timeit.timeit(optionFive, number=1)
-        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
 
     elif int(inputs[0]) == 6:
         Tmax=float(input("Ingere el tiempo mÃ¡ximo de resistencia en minutos: "))
         initStation = input("Ingrese el ID de la estaciÃ³n de inicio (Ej: 72): ")
         executiontime = timeit.timeit(optionSix, number=1)
-        print("Tiempo de ejecuciÃÂ³n: " + str(executiontime))
+        print("\nTiempo de ejecuciÃÂ³n: " + str(executiontime))
 
     elif int(inputs[0]) == 7:
         rango=input("Ingrese rango de edad:")
         executiontime = timeit.timeit(optionSeven, number=1)
-        print("Tiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
         
     elif int(inputs[0]) == 8:
         latu = float(input("Ingrese la latitud de su ubicacion: "))

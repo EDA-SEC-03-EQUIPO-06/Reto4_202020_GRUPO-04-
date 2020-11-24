@@ -251,7 +251,6 @@ def recomendador_rutas(analyzer,rango):
             FinalStation = info["vertexB"]
             #name2=getName(analyzer["stationinfo"], FinalStation)
             Estaciones.append(FinalStation)
-    print(OutStationMax,InStationMax,Estaciones)
     return (OutStationMax,InStationMax,Estaciones)
 
 #Requerimento 6
