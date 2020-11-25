@@ -144,18 +144,16 @@ def sameCC(analyzer,station1,station2):
 
 #Requerimiento 2 El mas bello 
 def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
-    r = {"Rutas": 0, "R_Especifico": {}, }
+    r = {"R_Especifico": {}}
 
     rutas = 0
     verticeslst = gr.vertices(analyzer['graph'])
     vertices = it.newIterator(verticeslst)
     while it.hasNext(vertices):
-        time = 0
+        time = -20
         vertice = it.next(vertices)
 
-        if sameCC(analyzer,StartStationid,vertice) == None:
-            print("aqui no fue :c")
-        elif sameCC(analyzer,StartStationid,vertice):
+        if sameCC(analyzer,StartStationid,vertice):
             
             djk_startstation = djk.Dijkstra(analyzer['graph'], StartStationid)
             djk_FinalStation = djk.Dijkstra(analyzer['graph'], vertice)
@@ -166,15 +164,20 @@ def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
             time += ((djk.distTo(djk_FinalStation, StartStationid))/60)
             time += (20*st.size(pila_vuelta))
             time += (20*st.size(pila_ida)) 
-
+            time = round(time, 2)
+            
             if time >= (avaibleTimemin) and time <= avaibleTimemax:
                 rutas +=1
                 StartStationName = getName(analyzer["stationinfo"],StartStationid)
                 FinalStationName = getName(analyzer["stationinfo"],vertice)
-                r["R_Especifico"][rutas] = {"Nombre_station_Inicio":StartStationName, "Nombre_station_Final": FinalStationName, "tiempo": time}
+                r["R_Especifico"][rutas] = {"Nombre_station_Inicio":StartStationName, "Nombre_station_Final": FinalStationName, "tiempo en min ": time}
+        elif sameCC(analyzer,StartStationid,vertice) == None:
+            print("aqui no fue :c")
+        
+    
+    return (rutas, r)
 
-    r["Rutas"] = rutas
-    return r
+    
 #Requerimento 3
 def stationsUsage(analyzer):
     indegreePQ = pq.newMinPQ(cmpfunction= compareDegreeMax)
