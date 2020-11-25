@@ -242,15 +242,18 @@ def recomendador_rutas(analyzer,rango):
     path = djk.pathTo(search, InStationMax)
     Estaciones=[]
     
-    while not st.isEmpty(path):
-        info = st.pop(path)
-        station = info["vertexA"]
-        #name = getName(analyzer["stationinfo"], station)
-        Estaciones.append(station)
-        if st.size(path) ==0:
-            FinalStation = info["vertexB"]
-            #name2=getName(analyzer["stationinfo"], FinalStation)
-            Estaciones.append(FinalStation)
+    if path is None:
+        Estaciones = None
+    else:
+        while not st.isEmpty(path):
+            info = st.pop(path)
+            station = info["vertexA"]
+            #name = getName(analyzer["stationinfo"], station)
+            Estaciones.append(station)
+            if st.size(path) ==0:
+                FinalStation = info["vertexB"]
+                #name2=getName(analyzer["stationinfo"], FinalStation)
+                Estaciones.append(FinalStation)
     return (OutStationMax,InStationMax,Estaciones)
 
 #Requerimento 6

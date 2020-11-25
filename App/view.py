@@ -108,13 +108,13 @@ def optionFive():
     info = controller.getTop(cont)
     print("\nTop 3 de las estaciones con mas llegadas: \n")
     for i in info["In"]:
-        print("â  "+ i["id"]+" con un total de "+ str(i["In"])+" llegadas")
+        print("■  "+ i["id"]+" con un total de "+ str(i["In"])+" llegadas")
     print("\nTop 3 de las estaciones con mas salidas \n")
     for i in info["Out"]:
-        print("â  "+ i["id"]+" con un total de "+ str(i["Out"])+" llegadas")
+        print("■  "+ i["id"]+" con un total de "+ str(i["Out"])+" llegadas")
     print("\nTop 3 de las estaciones menos usadas: \n")
     for i in info["Usage"]:
-        print("â  "+ i["id"]+" con un total de "+ str(i["Usage"])+" llegadas y salidas")
+        print("■  "+ i["id"]+" con un total de "+ str(i["Usage"])+" llegadas y salidas")
     
 
 def optionSix():
@@ -146,7 +146,10 @@ def optionSeven():
         print("\nRango elegido: "+rango+" años")
         print("\nEl id de la estación de la que más salen usuarios en el rango es: "+resultados[0]+".")
         print("El id de la estación a la que más llegan usuarios en el rango es: "+resultados[1]+".")
-        print("La ruta de estaciones es: "+ " - ".join(resultados[2]))
+        if resultados[2] != None:
+            print("La ruta de estaciones es: "+ " - ".join(resultados[2]))
+        else:
+            print("No hay ruta entre estas estaciones :(")
 
         
 def optionEight():
