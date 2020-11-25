@@ -64,7 +64,7 @@ def loadTrips(citibike):
 def loadFile(citibike, tripfile):
     """
     """
-    tripfile=cf.data_dir+tripfile
+    tripfile = cf.data_dir + tripfile
     input_file = csv.DictReader(open(tripfile, encoding= "utf-8"),
                                 delimiter = ",")
     for trip in input_file:
@@ -107,3 +107,9 @@ def recorrido_resistencia(analyzer,initStation, Tmax):
 
 def recomendador_rutas(analyzer,rango):
     return model.recomendador_rutas(analyzer,rango)
+
+def getCircularroute(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
+    avaibleTimemin = int(avaibleTimemin)
+    avaibleTimemax = int(avaibleTimemax)
+    return model.circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax)
+

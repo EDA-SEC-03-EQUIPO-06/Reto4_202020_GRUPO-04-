@@ -45,7 +45,6 @@ def newEdge(va, vb, weight=0):
             }
     return edge
 
-
 def weight(edge):
     """
     Retorna el peso de un arco

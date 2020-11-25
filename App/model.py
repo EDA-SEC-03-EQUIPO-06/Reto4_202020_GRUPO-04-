@@ -35,6 +35,7 @@ from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import bfs
 from DISClib.Algorithms.Graphs import dijsktra as djk
+from DISClib.Algorithms.Graphs import dfs 
 from DISClib.Utils import error as error
 from DISClib.DataStructures import edge as e
 assert config
@@ -141,8 +142,44 @@ def sameCC(analyzer,station1,station2):
         return scc.stronglyConnected(analyzer['components'],station1,station2)
     except:
         return None
-    
 
+
+#Requerimiento 2 El mas bello 
+def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
+    r = {"R_Especifico": {}}
+
+    rutas = 0
+    verticeslst = gr.vertices(analyzer['graph'])
+    vertices = it.newIterator(verticeslst)
+    while it.hasNext(vertices):
+        time = -20
+        vertice = it.next(vertices)
+
+        if sameCC(analyzer,StartStationid,vertice):
+            
+            djk_startstation = djk.Dijkstra(analyzer['graph'], StartStationid)
+            djk_FinalStation = djk.Dijkstra(analyzer['graph'], vertice)
+            pila_vuelta = djk.pathTo(djk_FinalStation, StartStationid)
+            pila_ida = djk.pathTo(djk_startstation, vertice)
+
+            time += ((djk.distTo(djk_startstation, vertice))/60)
+            time += ((djk.distTo(djk_FinalStation, StartStationid))/60)
+            time += (20*st.size(pila_vuelta))
+            time += (20*st.size(pila_ida)) 
+            time = round(time, 2)
+            
+            if time >= (avaibleTimemin) and time <= avaibleTimemax:
+                rutas +=1
+                StartStationName = getName(analyzer["stationinfo"],StartStationid)
+                FinalStationName = getName(analyzer["stationinfo"],vertice)
+                r["R_Especifico"][rutas] = {"Nombre_station_Inicio":StartStationName, "Nombre_station_Final": FinalStationName, "tiempo en min ": time}
+        elif sameCC(analyzer,StartStationid,vertice) == None:
+            print("aqui no fue :c")
+        
+    
+    return (rutas, r)
+
+    
 #Requerimento 3
 def stationsUsage(analyzer):
     indegreePQ = pq.newMinPQ(cmpfunction= compareDegreeMax)

@@ -101,7 +101,14 @@ def optionFour():
     """
     Requerimento 2
     """
-    
+    r = controller.getCircularroute(cont,starstation, minTime,maxTime )  
+    print("\nEl numero de rutas encontrdas fue "+ str(r[0]) + "\n") 
+    print("El detalle cada ruta es: ")
+    c = 0
+    for i in (r[1]["R_Especifico"]):
+        c+=1
+        print("\n→ Ruta "+str(c)+ ", informacion: " +  str(r[1]["R_Especifico"][i]))
+
 def optionFive():
     """
     Requerimento 3
@@ -112,7 +119,7 @@ def optionFive():
         print("■  "+ i["id"]+" con un total de "+ str(i["In"])+" llegadas")
     print("\nTop 3 de las estaciones con mas salidas \n")
     for i in info["Out"]:
-        print("■  "+ i["id"]+" con un total de "+ str(i["Out"])+" llegadas")
+        print("■  "+ i["id"]+" con un total de "+ str(i["Out"])+" salidas")
     print("\nTop 3 de las estaciones menos usadas: \n")
     for i in info["Usage"]:
         print("■  "+ i["id"]+" con un total de "+ str(i["Usage"])+" llegadas y salidas")
@@ -166,7 +173,7 @@ def optionEight():
     else:
         print("La ruta con la que llegaras en menor tiempo es: ")
         for parada in info["Route"]:
-            print("â  "+parada)
+            print("■ "+parada)
         print("El tiempo aproximado de esta ruta es de "+ str(info["Time"])+ " segundos. Buena suerte!")
     
     
@@ -183,7 +190,7 @@ while True:
 
     if int(inputs[0]) == 1:
         print("\nInicializando....")
-        # cont es el controlador que se usarÃ¡ de acÃ¡ en adelante
+        # cont es el controlador que se usará de acá en adelante
         cont = controller.init()
 
     elif int(inputs[0]) == 2:
@@ -195,10 +202,11 @@ while True:
         print("\nTiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 4:
-        msg = "Estación Base: BusStopCode-ServiceNo (Ej: 75009-10): "
-        initialStation = input(msg)
+        starstation = input("Identificador estacion de inicio: ")
+        minTime = input("tiempo minimo en min: ")
+        maxTime = input("Tiempo maximo en min: ")
         executiontime = timeit.timeit(optionFour, number=1)
-        print("\nTiempo de ejecución: " + str(executiontime))
+        print("Tiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 5:
         executiontime = timeit.timeit(optionFive, number=1)
