@@ -259,10 +259,25 @@ def outdegree(graph, vertex):
         return 0
     except Exception as exp:
         error.reraise(exp, 'ajlist:outdegree')
+        
+def outdegree2(graph, vertex):
+    try:
+        if (graph['directed']):
+            element = map.get(graph['vertices'], vertex)
+            lst = element['value']
+            count = 0
+            ite = it.newIterator(lst)
+            while it.hasNext(ite):
+                edge = it.next(ite)
+                count += edge["count"]
+            return count
+        return 0
+    except Exception as exp:
+        error.reraise(exp, 'ajlist:outdegree')
 
-
+"""
 def getEdge(graph, vertexa, vertexb):
-    """
+    
     Retorna el arco asociado a los vertices vertexa ---- vertexb
 
     Args:
@@ -274,7 +289,7 @@ def getEdge(graph, vertexa, vertexb):
         El arco que une los verices vertexa y vertexb
     Raises:
         Exception
-    """
+    
     try:
         element = map.get(graph['vertices'], vertexa)
         lst = element['value']
@@ -287,6 +302,22 @@ def getEdge(graph, vertexa, vertexb):
                    (e.other(edge, e.either(edge)) == vertexb)):
                     return edge
         return None
+    except Exception as exp:
+        error.reraise(exp, 'ajlist:getedge')
+"""
+def getEdge(graph, vertexa, vertexb):
+    try:
+        element = map.get(graph['vertices'], vertexa)
+        lst = element['value']
+        itvertex = it.newIterator(lst)
+        while (it.hasNext(itvertex)):
+            edge = it.next(itvertex)
+            if (e.either(edge) == vertexa) and (e.other(edge, e.either(edge)) == vertexb):
+                return edge
+            elif (not graph['directed']) and (e.either(edge) == vertexb) and (e.other(edge, e.either(edge)) == vertexa):
+                return edge
+        return None
+
     except Exception as exp:
         error.reraise(exp, 'ajlist:getedge')
 

@@ -173,6 +173,9 @@ def outdegree(graph, vertex):
         Exception
     """
     return gr.outdegree(graph, vertex)
+    
+def outdegree2(graph, vertex):
+    return gr.outdegree2(graph, vertex)
 
 
 def indegree(graph, vertex):

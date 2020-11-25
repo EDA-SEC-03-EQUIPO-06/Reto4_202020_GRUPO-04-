@@ -24,6 +24,7 @@
 
 import config
 assert config
+from DISClib.ADT import map as map 
 
 """
 Este código está basado en las implementaciones propuestas en:
@@ -78,10 +79,14 @@ def compareedges(edge1, edge2):
             return True
     return False
     
-def updateAverageWeight(edge, newweight):
+def updateAverageWeight(graph, edge, newweight, vb):
     """
     Actualiza el peso del arco entre los vertices usando el promedio entre los pesos
     """
     edge['sum']+= newweight
     edge['count']+=1 
     edge['weight'] = edge['sum']/edge['count']
+    if graph["directed"]:
+        degree = map.get(graph['indegree'], vb)
+        map.put(graph['indegree'], vb, degree['value']+1)
+        

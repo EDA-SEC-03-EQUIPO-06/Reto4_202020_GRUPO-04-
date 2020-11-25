@@ -1,5 +1,5 @@
 """
- * Copyright 2020, Departamento de sistemas y ComputaciÃ³n
+ * Copyright 2020, Departamento de sistemas y Computación
  * Universidad de Los Andes
  *
  *
@@ -18,12 +18,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ContribuciÃ³n de:
+ * Contribución de:
  *
  * Dario Correal
  *
  """
 import config
+import math
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
@@ -76,10 +77,11 @@ def addTrip(citibike, trip):
         
     duration = int(trip["tripduration"])
     addStation(citibike, origin, originInfo)
-    addStation(citibike, destination, destinationInfo)
-    addConnection(citibike, origin, destination, duration)
-    addAges(originInfo,trip, True)
-    addAges(destinationInfo, trip, False)
+    if origin != destination:
+        addStation(citibike, destination, destinationInfo)
+        addConnection(citibike, origin, destination, duration)
+        addAges(originInfo,trip, True)
+        addAges(destinationInfo, trip, False)
     
 def addAges(station,info, origin):
     group = getAgeGroup(info["birth year"])
@@ -105,7 +107,7 @@ def addConnection(citibike, origin, destination, duration):
     if edge is None:
         gr.addEdge(citibike["graph"], origin, destination, duration)
     else:
-        e.updateAverageWeight(edge,duration)
+        e.updateAverageWeight(citibike["graph"],edge,duration,destination)
     return citibike
     
 
@@ -156,7 +158,7 @@ def stationsUsage(analyzer):
         #Se obtienen los valores de las estaciones que entran, que salen y su suma
         
         indegree = gr.indegree(analyzer["graph"],station)
-        outdegree = gr.outdegree(analyzer["graph"],station)
+        outdegree = gr.outdegree2(analyzer["graph"],station)
         usage = outdegree+indegree
         #Se crean entradas para organizar en el PQ
         
@@ -353,13 +355,13 @@ def getClosestStation(analyzer, coords):
     
     return closestID
     
-def getDistance(coords1,coords2):
+def getDistance(coords1,coords2)->float:
     """
     Retorna la distancia entre dos coordenadas dadas
     """
-    distanceSquared = (coords1[0]-coords2[0])**2 + (coords1[1]-coords2[1])**2
-    return distanceSquared**0.5
-
+    res = 6371.01 * math.acos((math.sin(math.radians(coords1[0]))*math.sin(math.radians(coords2[0])))+(math.cos(math.radians(coords1[0]))*math.cos(math.radians(coords2[0]))*math.cos(math.radians(coords1[1]-coords2[1]))))
+    return round(res,2)
+    
 def getName(map, key):
     """
     Retorna el nombre de una estacion asociada al ID dado (key)
@@ -393,7 +395,7 @@ def getAgeGroup(birth):
     else:
         return "60+"
         
-    
+   
 
 # ==============================
 # Funciones de Comparacion

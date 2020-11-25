@@ -1,5 +1,5 @@
 """
- * Copyright 2020, Departamento de sistemas y ComputaciÃ³n
+ * Copyright 2020, Departamento de sistemas y Computación
  * Universidad de Los Andes
  *
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ContribuciÃ³n de:
+ * Contribución de:
  *
  * Dario Correal
  *
@@ -33,10 +33,10 @@ import timeit
 assert config
 
 """
-La vista se encarga de la interacciÃ³n con el usuario.
+La vista se encarga de la interacción con el usuario.
 Presenta el menu de opciones  y  por cada seleccion
 hace la solicitud al controlador para ejecutar la
-operaciÃ³n seleccionada.
+operación seleccionada.
 """
 
 # ___________________________________________________
@@ -57,18 +57,19 @@ def printMenu():
     print("*******************************************")
     print("Bienvenido")
     print("1- Inicializar Analizador")
-    print("2- Cargar informaciÃ³n de buses de singapur")
+    print("2- Cargar información de citibike")
     print("3- Calcular componentes conectados")
-    print("4- Establecer estaciÃ³n base:")
-    print("5- Conseguir Top 3 de estaciones")
+    print("4- Encontrar rutas circulares: ")
+    print("5- Conseguir Top 3 de estaciones: ")
     print("6- Rutas por resistencia: ")
     print("7- Estaciones más visitadas por rango de edad: ")
+    print("8- Buscar ruta por latitud y longitud: ")
     print("0- Salir")
     print("*******************************************")
 
 
 def optionTwo():
-    print("\nCargando informaciÃ³n de transporte de singapur ....")
+    print("\nCargando información de transporte de singapur ....")
     controller.loadTrips(cont)
     numedges = controller.totalRoutes(cont)
     numvertex = controller.totalStations(cont)
@@ -178,7 +179,7 @@ Menu principal
 """
 while True:
     printMenu()
-    inputs = input('Seleccione una opciÃ³n para continuar\n>')
+    inputs = input('Seleccione una opción para continuar\n>')
 
     if int(inputs[0]) == 1:
         print("\nInicializando....")
@@ -187,33 +188,32 @@ while True:
 
     elif int(inputs[0]) == 2:
         executiontime = timeit.timeit(optionTwo, number=1)
-        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 3:
         executiontime = timeit.timeit(optionThree, number=1)
-        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 4:
-        msg = "EstaciÃ³n Base: BusStopCode-ServiceNo (Ej: 75009-10): "
+        msg = "Estación Base: BusStopCode-ServiceNo (Ej: 75009-10): "
         initialStation = input(msg)
         executiontime = timeit.timeit(optionFour, number=1)
-        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 5:
-        #destStation = input("EstaciÃ³n destino (Ej: 15151-10): ")
         executiontime = timeit.timeit(optionFive, number=1)
-        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 6:
         Tmax=float(input("Ingere el tiempo mÃ¡ximo de resistencia en minutos: "))
-        initStation = input("Ingrese el ID de la estaciÃ³n de inicio (Ej: 72): ")
+        initStation = input("Ingrese el ID de la estación de inicio (Ej: 72): ")
         executiontime = timeit.timeit(optionSix, number=1)
-        print("\nTiempo de ejecuciÃÂ³n: " + str(executiontime))
+        print("\nTiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 7:
         rango=input("Ingrese rango de edad:")
         executiontime = timeit.timeit(optionSeven, number=1)
-        print("\nTiempo de ejecuciÃ³n: " + str(executiontime))
+        print("\nTiempo de ejecución: " + str(executiontime))
         
     elif int(inputs[0]) == 8:
         latu = float(input("Ingrese la latitud de su ubicacion: "))

@@ -1,5 +1,5 @@
 """
- * Copyright 2020, Departamento de sistemas y ComputaciÃ³n
+ * Copyright 2020, Departamento de sistemas y Computación
  * Universidad de Los Andes
  *
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ContribuciÃ³n de:
+ * Contribución de:
  *
  * Dario Correal
  *

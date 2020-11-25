@@ -182,6 +182,22 @@ def outdegree(graph, vertex):
     """
     if (graph['type'] == "ADJ_LIST"):
         return alt.outdegree(graph, vertex)
+        
+def outdegree2(graph, vertex):
+    """
+    Retorna el numero de arcos que salen del grafo vertex
+
+    Args:
+        graph: El grafo sobre el que se ejecuta la operacion
+        vertex: El vertice del que se desea conocer el grado
+
+    Returns:
+        El grado del vertice
+    Raises:
+        Exception
+    """
+    if (graph['type'] == "ADJ_LIST"):
+        return alt.outdegree2(graph, vertex)
 
 
 def indegree(graph, vertex):
