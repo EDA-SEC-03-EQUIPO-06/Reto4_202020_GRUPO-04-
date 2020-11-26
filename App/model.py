@@ -141,12 +141,11 @@ def sameCC(analyzer,station1,station2):
     except:
         return None
 
-
-#Requerimiento 2 El mas bello 
 def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
     r = {"R_Especifico": {}}
-
     rutas = 0
+    totalrutas = 0
+    Kosaraju = connectedComponents(analyzer)
     verticeslst = gr.vertices(analyzer['graph'])
     vertices = it.newIterator(verticeslst)
     while it.hasNext(vertices):
@@ -154,19 +153,39 @@ def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
         vertice = it.next(vertices)
 
         if sameCC(analyzer,StartStationid,vertice):
-            
-            djk_startstation = djk.Dijkstra(analyzer['graph'], StartStationid)
-            djk_FinalStation = djk.Dijkstra(analyzer['graph'], vertice)
-            pila_vuelta = djk.pathTo(djk_FinalStation, StartStationid)
-            pila_ida = djk.pathTo(djk_startstation, vertice)
-
-            time += ((djk.distTo(djk_startstation, vertice))/60)
-            time += ((djk.distTo(djk_FinalStation, StartStationid))/60)
-            time += (20*st.size(pila_vuelta))
-            time += (20*st.size(pila_ida)) 
+            totalrutas += 1
+            bfs_startstation = dfs.DepthFirstSearch(analyzer['graph'], StartStationid)
+            if  (gr.getEdge(analyzer['graph'], vertice, StartStationid)) != None: 
+                tiempo_vuelta = e.weight(gr.getEdge(analyzer['graph'], vertice, StartStationid))
+                print(tiempo_vuelta)
+                tiempo_vuelta = tiempo_vuelta/60
+                
+                pila_ida = (dfs.pathTo(bfs_startstation, vertice))
+                v1 = st.pop(pila_ida)
+                time += (20*st.size(pila_ida)) 
+                
+                while not st.isEmpty(pila_ida):
+                    v2 = st.pop(pila_ida)
+                    time += e.weight(gr.getEdge(analyzer['graph'], v1, v2))
+                    v1 = v2
+            else: 
+                bfs_backstation = dfs.DepthFirstSearch(analyzer['graph'], vertice)
+                pila_ida = (dfs.pathTo(bfs_startstation, vertice))
+                pila_vuelta = (dfs.pathTo(bfs_b1ackstation, vertice))
+                v1v = st.pop(pila_vuelta)
+                v1 = st.pop(pila_ida)
+                while not st.isEmpty(pila_ida):
+                    v2 = st.pop(pila_ida)
+                    time += e.weight(gr.getEdge(analyzer['graph'], v1, v2))
+                    v1 = v2
+                while not st.isEmpty(pila_vuelta):
+                    v2v = st.pop(pila_vuelta)
+                    time += e.weight(gr.getEdge(analyzer['graph'], v1v, v2v))
+                    v1v = v2v
+                time += (20*st.size(pila_ida)) 
             time = round(time, 2)
             
-            if time >= (avaibleTimemin) and time <= avaibleTimemax:
+            if time >= avaibleTimemin and time <= avaibleTimemax:
                 rutas +=1
                 StartStationName = getName(analyzer["stationinfo"],StartStationid)
                 FinalStationName = getName(analyzer["stationinfo"],vertice)
@@ -175,9 +194,8 @@ def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
             print("aqui no fue :c")
         
     
-    return (rutas, r)
+    return (totalrutas, rutas,  r)
 
-    
 #Requerimento 3
 def stationsUsage(analyzer):
     indegreePQ = pq.newMinPQ(cmpfunction= compareDegreeMax)
@@ -208,7 +226,8 @@ def stationsUsage(analyzer):
         pq.insert(outdegreePQ, outdegreeEntry)
         
     return {"In": indegreePQ,"Out": outdegreePQ, "Usage": lessUsedPQ}
-    
+
+
 def organizeTop3(PQs):
     InTop = []
     OutTop = []
@@ -261,9 +280,12 @@ def giveShortestRoute(analyzer, originCoords, destCoords):
     
     finalInfo = {"InitialStation": originStationName, "EndStation": destinStationName, "Route": route, "Time": time}
     return finalInfo
-        
     
     
+    
+#Requerimento BONO
+def 
+
 
 
 # ==============================
@@ -277,13 +299,16 @@ def organizeData(information, origin):
         information: El diccionario que viene del archivo con toda la info sobre un viaje
         Origin: Un booleando que define si se esta arreglando la estacion de inicio o de final de un viaje en particular 
     """
-    stationInfo = {"StationID":None, "StationName": None, "Coordinates": None,"Ages":None}
+    stationInfo = {"StationID":None, "StationName": None, "Coordinates": None,"Ages":None, 'Client': None}
+    
+    stationInfo["Client"] = information["usertype"]
     if origin:
         stationInfo["StationID"] = information["start station id"]
         stationInfo["StationName"] = information["start station name"]
         stationInfo["Coordinates"] = (float(information["start station latitude"]),float(information["start station longitude"]))
         stationInfo["Ages"] = m.newMap(maptype="PROBING",
                                          comparefunction= compareAges)
+       
         
     else:
         stationInfo["StationID"] = information["end station id"]

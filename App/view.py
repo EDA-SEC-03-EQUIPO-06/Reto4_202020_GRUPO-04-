@@ -104,9 +104,9 @@ def optionFour():
     print("\nEl numero de rutas encontrdas fue "+ str(r[0]) + "\n") 
     print("El detalle cada ruta es: ")
     c = 0
-    for i in (r[1]["R_Especifico"]):
+    for i in (r[2]["R_Especifico"]):
         c+=1
-        print("\n→ Ruta "+str(c)+ ", informacion: " +  str(r[1]["R_Especifico"][i]))
+        print("\n→ Ruta "+str(c)+ ", informacion: " +  str(r[2]["R_Especifico"][i]))
 
 def optionFive():
     """
