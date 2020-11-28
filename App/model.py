@@ -152,20 +152,20 @@ def sameCC(analyzer,station1,station2):
 def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
     r = {"R_Especifico": {}}
     rutas = 0
-    totalrutas = 0
+    totalrutas = -1
     Kosaraju = connectedComponents(analyzer)
     verticeslst = gr.vertices(analyzer['graph'])
     vertices = it.newIterator(verticeslst)
+    bfs_startstation = dfs.DepthFirstSearch(analyzer['graph'], StartStationid)
     while it.hasNext(vertices):
         time = -20
         vertice = it.next(vertices)
 
         if sameCC(analyzer,StartStationid,vertice):
             totalrutas += 1
-            bfs_startstation = dfs.DepthFirstSearch(analyzer['graph'], StartStationid)
             if  (gr.getEdge(analyzer['graph'], vertice, StartStationid)) != None: 
                 tiempo_vuelta = e.weight(gr.getEdge(analyzer['graph'], vertice, StartStationid))
-                tiempo_vuelta = tiempo_vuelta/60
+                tiempo_vuelta = tiempo_vuelta
                 
                 pila_ida = (dfs.pathTo(bfs_startstation, vertice))
                 v1 = st.pop(pila_ida)
@@ -175,22 +175,29 @@ def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
                     v2 = st.pop(pila_ida)
                     time += e.weight(gr.getEdge(analyzer['graph'], v1, v2))
                     v1 = v2
+                    if time/60> avaibleTimemax:
+                        break
             else: 
                 bfs_backstation = dfs.DepthFirstSearch(analyzer['graph'], vertice)
                 pila_ida = (dfs.pathTo(bfs_startstation, vertice))
                 pila_vuelta = (dfs.pathTo(bfs_backstation, vertice))
                 v1v = st.pop(pila_vuelta)
                 v1 = st.pop(pila_ida)
+                time += (20*(st.size(pila_ida)+st.size(pila_vuelta)))
                 while not st.isEmpty(pila_ida):
                     v2 = st.pop(pila_ida)
                     time += e.weight(gr.getEdge(analyzer['graph'], v1, v2))
                     v1 = v2
+                    if time/60> avaibleTimemax:
+                        break
                 while not st.isEmpty(pila_vuelta):
                     v2v = st.pop(pila_vuelta)
                     time += e.weight(gr.getEdge(analyzer['graph'], v1v, v2v))
                     v1v = v2v
-                time += (20*st.size(pila_ida)) 
-            time = round(time, 2)
+                    if time/60> avaibleTimemax:
+                        break
+                 
+            time = round(time/60, 2)
             
             if time >= avaibleTimemin and time <= avaibleTimemax:
                 rutas +=1
@@ -198,7 +205,7 @@ def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
                 FinalStationName = getName(analyzer["stationinfo"],vertice)
                 r["R_Especifico"][rutas] = {"Nombre_station_Inicio":StartStationName, "Nombre_station_Final": FinalStationName, "tiempo en min ": time}
         elif sameCC(analyzer,StartStationid,vertice) == None:
-            print("aqui no fue :c")
+            pass
         
     
     return (totalrutas, rutas,  r)
@@ -299,8 +306,10 @@ def recomendador_rutas(analyzer,rango):
                 InNumber=entry["In"]
                 InStationMax=station
             if entry["Out"]>= OutNumber:
-                OutNumber=entry["In"]
+                OutNumber=entry["Out"]
                 OutStationMax=station
+    print(InNumber)
+    print(OutNumber)
     if len(OutStationMax)<=0 or len(InStationMax)<=0:
         return 0
     search = djk.Dijkstra(analyzer["graph"], OutStationMax)
@@ -371,20 +380,21 @@ def announcementStation(analyzer, edad):
         
         a_comparar = e.usertype(edge)[edad]['Customer']
         if a_comparar>mayor:
+            r = []
             mayor = a_comparar
             e_mayor1['Estación Incio: '] = e.either(edge)
             e_mayor1['Esación llegada: '] = edge['vertexB']
             e_mayor1['viajes_Totales: '] = e.getTotaltrips(edge)
             
-            if a_comparar == mayor:
-                e_mayor2['Estación Incio: '] = e.either(edge)
-                e_mayor2['Esación llegada: '] = edge['vertexB']
-                e_mayor2['viajes_Totales: '] = e.getTotaltrips(edge)
+        elif a_comparar == mayor:
+            e_mayor2['Estación Incio: '] = e.either(edge)
+            e_mayor2['Esación llegada: '] = edge['vertexB']
+            e_mayor2['viajes_Totales: '] = e.getTotaltrips(edge)
             
-                r.append(e_mayor2)
+            r.append(e_mayor2)
         
-        if e_mayor1 not in r:
-            r.append(e_mayor1)
+    if e_mayor1 not in r:
+        r.append(e_mayor1)
 
     return (r)
 #Requerimiento 8 (BONO)
