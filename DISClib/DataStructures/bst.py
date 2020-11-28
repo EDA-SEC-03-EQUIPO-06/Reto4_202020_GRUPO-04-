@@ -36,7 +36,7 @@ assert config
   Este código está basado en la implementación
   propuesta por R.Sedgewick y Kevin Wayne en su libro
   Algorithms, 4th Edition
-"""
+"""6
 
 #  ------------------------------------------------------------
 #                       API TAD_BST

@@ -113,3 +113,5 @@ def getCircularroute(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
     avaibleTimemax = int(avaibleTimemax)
     return model.circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax)
 
+def Bono1(analyzer, edad):
+    return model.announcementStation(analyzer, edad)

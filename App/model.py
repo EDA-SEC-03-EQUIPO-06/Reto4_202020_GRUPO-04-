@@ -66,6 +66,8 @@ def addTrip(citibike, trip):
     """
     origin = trip["start station id"]
     destination = trip["end station id"]
+    usertype = trip['usertype']
+    group = getAgeGroup(trip["birth year"])
     
     if not m.contains(citibike["stationinfo"], origin):
         originInfo = organizeData(trip,True)
@@ -80,7 +82,7 @@ def addTrip(citibike, trip):
     addStation(citibike, origin, originInfo)
     if origin != destination:
         addStation(citibike, destination, destinationInfo)
-        addConnection(citibike, origin, destination, duration)
+        addConnection(citibike, origin, destination, duration, usertype, group)
         addAges(originInfo,trip, True)
         addAges(destinationInfo, trip, False)
     
@@ -103,12 +105,14 @@ def addStation(citibike, id, info):
         m.put(citibike['stationinfo'],id,info)
     return citibike
     
-def addConnection(citibike, origin, destination, duration):
+def addConnection(citibike, origin, destination, duration, usertype, group):
     edge = gr.getEdge(citibike["graph"], origin, destination)
     if edge is None:
         gr.addEdge(citibike["graph"], origin, destination, duration)
     else:
+
         e.updateAverageWeight(citibike["graph"],edge,duration,destination)
+        e.updateUserType(edge, usertype, group)
     return citibike
     
 
@@ -225,6 +229,8 @@ def organizeTop3(PQs):
         UsageTop.append({"id": Usage["station"], "Usage": Usage["key"] })
         
     return {"In": InTop,"Out": OutTop, "Usage": UsageTop}
+
+
 #Requerimiento 4
 def recorrido_resistencia(analyzer, initStation, Tmax):
     newGraph=bfs.BreadhtFisrtSearch(analyzer["graph"], initStation,Tmax)
@@ -255,8 +261,8 @@ def recorrido_resistencia(analyzer, initStation, Tmax):
                 rutas.append(ruta)
     return rutas
 
-#Requerimiento 5
 
+#Requerimiento 5
 def recomendador_rutas(analyzer,rango):
     vertices = gr.vertices(analyzer["graph"])
     iterator = it.newIterator(vertices)
@@ -295,8 +301,8 @@ def recomendador_rutas(analyzer,rango):
                 Estaciones.append(FinalStation)
     return (OutStationMax,InStationMax,Estaciones)
 
-#Requerimento 6
 
+#Requerimento 6
 def giveShortestRoute(analyzer, originCoords, destCoords):
     """
     Encuentra la ruta mas corta para ir desde una posicion (originCoords) a otra (destCoords).
@@ -332,7 +338,39 @@ def giveShortestRoute(analyzer, originCoords, destCoords):
     finalInfo = {"InitialStation": originStationName, "EndStation": destinStationName, "Route": route, "Time": time}
     return finalInfo
         
-#Requerimiento 7
+#Requerimiento 7 (BONO)
+def announcementStation(analyzer, edad):
+    edgelst = gr.edges(analyzer['graph'])
+    edgeiterator = it.newIterator(edgelst)
+    mayor = 0
+    r = []
+    e_mayor1 = {'Estación Incio: ': 0,'Esación llegada: ':0, 'viajes_Totales: ':0} 
+    while it.hasNext(edgeiterator):
+        e_mayor2 = {'Estación Incio: ': 0,'Esación llegada: ':0,'viajes_Totales: ':0}
+        edge = it.next(edgeiterator)
+        
+        a_comparar = e.usertype(edge)[edad]['Customer']
+        if a_comparar>mayor:
+            mayor = a_comparar
+            e_mayor1['Estación Incio: '] = e.either(edge)
+            e_mayor1['Esación llegada: '] = edge['vertexB']
+            e_mayor1['viajes_Totales: '] = e.getTotaltrips(edge)
+            
+            if a_comparar == mayor:
+                e_mayor2['Estación Incio: '] = e.either(edge)
+                e_mayor2['Esación llegada: '] = edge['vertexB']
+                e_mayor2['viajes_Totales: '] = e.getTotaltrips(edge)
+            
+                r.append(e_mayor2)
+        
+        if e_mayor1 not in r:
+            r.append(e_mayor1)
+
+    return (r)
+#Requerimiento 8 (BONO)
+
+
+
 
     
 
@@ -349,6 +387,7 @@ def organizeData(information, origin):
         Origin: Un booleando que define si se esta arreglando la estacion de inicio o de final de un viaje en particular 
     """
     stationInfo = {"StationID":None, "StationName": None, "Coordinates": None,"Ages":None}
+
     if origin:
         stationInfo["StationID"] = information["start station id"]
         stationInfo["StationName"] = information["start station name"]

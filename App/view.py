@@ -62,8 +62,9 @@ def printMenu():
     print("4- Encontrar rutas circulares: ")
     print("5- Conseguir Top 3 de estaciones: ")
     print("6- Rutas por resistencia: ")
-    print("7- Estaciones más visitadas por rango de edad: ")
+    print("7- Valentina ")
     print("8- Buscar ruta por latitud y longitud: ")
+    print("9 BONO")
     print("0- Salir")
     print("*******************************************")
 
@@ -175,11 +176,14 @@ def optionEight():
         for parada in info["Route"]:
             print("■ "+parada)
         print("El tiempo aproximado de esta ruta es de "+ str(info["Time"])+ " segundos. Buena suerte!")
-    
-    
-    
 
-
+def optionNine(): 
+    """
+    Bono
+    """
+    print(controller.Bono1(cont, edad))
+    
+    
 
 """
 Menu principal
@@ -231,7 +235,10 @@ while True:
         coordsu = (latu,lonu)
         coordsd = (latd,lond)
         executiontime = timeit.timeit(optionEight, number=1)
-
+    elif int(inputs[0]) == 9:
+        edad = input("Grupo de Edad :")
+        executiontime = timeit.timeit(optionNine, number=1)
+        print("\nTiempo de ejecución: " + str(executiontime))
     else:
         sys.exit(0)
 sys.exit(0)

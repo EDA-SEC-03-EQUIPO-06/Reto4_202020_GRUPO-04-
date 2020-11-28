@@ -40,6 +40,10 @@ def newEdge(va, vb, weight=0):
     edge = {'vertexA': va,
             'vertexB': vb,
             'weight': weight,
+            'usertype':{"0-10": {'Subscriber': 0, 'Customer':0}, "11-20": {'Subscriber': 0, 'Customer':0}, 
+            "21-30": {'Subscriber': 0, 'Customer':0}, "31-40": {'Subscriber': 0, 'Customer':0}, 
+            "41-50": {'Subscriber': 0, 'Customer':0}, "51-60": {'Subscriber': 0, 'Customer':0},
+            "60+": {'Subscriber': 0, 'Customer':0}},
             'count': 1,
             'sum': weight,
             }
@@ -51,6 +55,36 @@ def weight(edge):
     """
     return edge['weight']
 
+def usertype(edge): 
+    """
+    Retorna un dic con los tipos de usuario y su cantidad
+    """
+    return edge['usertype']
+    
+def getTotaltrips(edge):
+    """
+    Retorna la cantidad de viajes por estación
+    """
+    trips = 0
+    trips += edge['usertype']["0-10"]["Subscriber"]
+    trips += edge['usertype']["0-10"]["Customer"]
+    trips += edge['usertype']["11-20"]["Subscriber"]
+    trips += edge['usertype']["11-20"]["Customer"]
+    trips += edge['usertype']["21-30"]["Subscriber"]
+    trips += edge['usertype']["21-30"]["Customer"]
+    trips += edge['usertype']["31-40"]["Subscriber"]
+    trips += edge['usertype']["31-40"]["Customer"]
+    trips += edge['usertype']["41-50"]["Subscriber"]
+    trips += edge['usertype']["41-50"]["Customer"]
+    trips += edge['usertype']["51-60"]["Subscriber"]
+    trips += edge['usertype']["51-60"]["Customer"]
+    trips += edge['usertype']["60+"]["Subscriber"]
+    trips += edge['usertype']["60+"]["Customer"]
+
+    return trips
+     
+     
+     
 
 def either(edge):
     """
@@ -77,7 +111,14 @@ def compareedges(edge1, edge2):
         if other(edge1, e1v) == other(edge2, e2v):
             return True
     return False
-    
+
+
+def updateUserType(edge, usertype, group): 
+    """
+    Actualiza el numero de usarios por clase de usario
+    """
+    edge['usertype'][group][usertype] += 1
+
 def updateAverageWeight(graph, edge, newweight, vb):
     """
     Actualiza el peso del arco entre los vertices usando el promedio entre los pesos
