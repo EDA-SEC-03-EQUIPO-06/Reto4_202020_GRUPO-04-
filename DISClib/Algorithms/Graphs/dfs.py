@@ -23,8 +23,7 @@
  * Dario Correal
  *
  """
-
-import config
+import configparser
 from DISClib.DataStructures import adjlist as g
 from DISClib.DataStructures import listiterator as it
 from DISClib.ADT import map as map

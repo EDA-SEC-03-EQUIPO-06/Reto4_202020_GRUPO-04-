@@ -148,11 +148,12 @@ def sameCC(analyzer,station1,station2):
         return None
 
 
-#Requerimiento 2 El mas bello 
+#Requerimiento 2
 def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
     r = {"R_Especifico": {}}
-
     rutas = 0
+    totalrutas = 0
+    Kosaraju = connectedComponents(analyzer)
     verticeslst = gr.vertices(analyzer['graph'])
     vertices = it.newIterator(verticeslst)
     while it.hasNext(vertices):
@@ -160,19 +161,38 @@ def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
         vertice = it.next(vertices)
 
         if sameCC(analyzer,StartStationid,vertice):
-            
-            djk_startstation = djk.Dijkstra(analyzer['graph'], StartStationid)
-            djk_FinalStation = djk.Dijkstra(analyzer['graph'], vertice)
-            pila_vuelta = djk.pathTo(djk_FinalStation, StartStationid)
-            pila_ida = djk.pathTo(djk_startstation, vertice)
-
-            time += ((djk.distTo(djk_startstation, vertice))/60)
-            time += ((djk.distTo(djk_FinalStation, StartStationid))/60)
-            time += (20*st.size(pila_vuelta))
-            time += (20*st.size(pila_ida)) 
+            totalrutas += 1
+            bfs_startstation = dfs.DepthFirstSearch(analyzer['graph'], StartStationid)
+            if  (gr.getEdge(analyzer['graph'], vertice, StartStationid)) != None: 
+                tiempo_vuelta = e.weight(gr.getEdge(analyzer['graph'], vertice, StartStationid))
+                tiempo_vuelta = tiempo_vuelta/60
+                
+                pila_ida = (dfs.pathTo(bfs_startstation, vertice))
+                v1 = st.pop(pila_ida)
+                time += (20*st.size(pila_ida)) 
+                
+                while not st.isEmpty(pila_ida):
+                    v2 = st.pop(pila_ida)
+                    time += e.weight(gr.getEdge(analyzer['graph'], v1, v2))
+                    v1 = v2
+            else: 
+                bfs_backstation = dfs.DepthFirstSearch(analyzer['graph'], vertice)
+                pila_ida = (dfs.pathTo(bfs_startstation, vertice))
+                pila_vuelta = (dfs.pathTo(bfs_backstation, vertice))
+                v1v = st.pop(pila_vuelta)
+                v1 = st.pop(pila_ida)
+                while not st.isEmpty(pila_ida):
+                    v2 = st.pop(pila_ida)
+                    time += e.weight(gr.getEdge(analyzer['graph'], v1, v2))
+                    v1 = v2
+                while not st.isEmpty(pila_vuelta):
+                    v2v = st.pop(pila_vuelta)
+                    time += e.weight(gr.getEdge(analyzer['graph'], v1v, v2v))
+                    v1v = v2v
+                time += (20*st.size(pila_ida)) 
             time = round(time, 2)
             
-            if time >= (avaibleTimemin) and time <= avaibleTimemax:
+            if time >= avaibleTimemin and time <= avaibleTimemax:
                 rutas +=1
                 StartStationName = getName(analyzer["stationinfo"],StartStationid)
                 FinalStationName = getName(analyzer["stationinfo"],vertice)
@@ -181,7 +201,7 @@ def circulargraph(analyzer, StartStationid, avaibleTimemin, avaibleTimemax):
             print("aqui no fue :c")
         
     
-    return (rutas, r)
+    return (totalrutas, rutas,  r)
 
     
 #Requerimento 3
